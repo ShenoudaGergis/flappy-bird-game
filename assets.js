@@ -4,7 +4,9 @@ import Sound from "./sound.js";
 export default function Loader() {
 	this.assets = {
 		"images" : [
-			{name : "background" , url : "./assets/images/background.png"},
+			{name : "background-0" , url : "./assets/images/background-0.png"},
+			{name : "background-1" , url : "./assets/images/background-1.png"},
+			{name : "background-2" , url : "./assets/images/background-2.png"},
 			{name : "bird-0" , url : "./assets/images/birdSprite/frame-0.png"},
 			{name : "bird-1" , url : "./assets/images/birdSprite/frame-1.png"},
 			{name : "bird-2" , url : "./assets/images/birdSprite/frame-2.png"},
@@ -12,8 +14,8 @@ export default function Loader() {
 			{name : "pipe"    , url : "./assets/images/pipe.png"}
 		],
 		"sounds" : [
-			{name : "background" , url : "./assets/sounds/background-music.mp3"},
-			{name : "lose"       , url : "./assets/sounds/birdHit.mp3"},
+			{name : "background" , url : "./assets/sounds/background.mp3"},
+			{name : "lose"       , url : "./assets/sounds/lose.mp3"},
 		],
 		"fonts"  : [
 			{name : "atari1" , url : "./assets/fonts/AtariClassic-gry3.ttf"},

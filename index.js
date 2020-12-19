@@ -1,14 +1,16 @@
 import Loader from "./assets.js";
 import Bird   from "./bird.js";
-import Block  from "./wall.js";  
+import Block  from "./wall.js"; 
+import { randomInteger } from "./utils.js" 
 //-------------------------------------------------------------------------------------------------
 
 function Game(canvasID) {
-	this.canvas  = document.getElementById(canvasID);
-	this.context = this.canvas.getContext("2d");
-	this.loader  = new Loader; 
-	this.timer   = null;
-	this.assets  = {}; 
+	this.canvas   = document.getElementById(canvasID);
+	this.context  = this.canvas.getContext("2d");
+	this.loader   = new Loader; 
+	this.timer    = null;
+	this.assets   = {};
+	this.gameOn   = false; 
 
 	this.adjustDimensions();
 	this.addCanvasControllers();
@@ -48,11 +50,13 @@ Game.prototype.start = function() {
 	return this.loader.fetch().then((done) => {
 		console.log("By the name of jesus christ all done..." , done);
 		this.assets = done;
-		this.assets["sounds"]["background"].play();
+		this.gameOn = true;
 		this.timer = setInterval(() => {
 
 			this.updateGamePhysics();
 			this.drawScene();
+			this.gameAudio();
+			this.checkEnd();
 
 		} , 30)
 		return done;
@@ -63,9 +67,26 @@ Game.prototype.start = function() {
 
 //-------------------------------------------------------------------------------------------------
 
-Game.prototype.drawBackground = function() {
-	this.context.drawImage(this.assets["images"]["background"] , 0 , 0 , this.canvas.width , this.canvas.height);
+Game.prototype.checkEnd = function() {
+	if(!this.gameOn) clearInterval(this.timer);
 }
+
+//-------------------------------------------------------------------------------------------------
+
+Game.prototype.drawBackground = function() {
+	this.context.drawImage(this.assets["images"]["background-0"] , 0 , 0 , this.canvas.width , this.canvas.height);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+Game.prototype.drawGameoverScene = function() {
+    this.context.font = "bold 50px atari2";
+    this.context.fillStyle   = "#FFF";
+    this.context.globalAlpha = 0.5;
+    this.context.fillRect(0 , 0 , this.canvas.width , this.canvas.height);
+    this.context.fillStyle   = "black";
+    this.context.fillText("Game Over" , Math.floor(this.canvas.width) / 2 - (Math.floor(this.context.measureText("Game Over").width / 2)) , Math.floor(this.canvas.height) / 2 , this.canvas.width);
+};
 
 //-------------------------------------------------------------------------------------------------
 
@@ -82,6 +103,7 @@ Game.prototype.drawScene = function() {
 	this.block.draw(this.context , this.assets["images"]["pipe"]);
 	this.bird.draw(this.context , this.assets["images"]["bird-0"] , this.assets["images"]["bird-1"] , this.assets["images"]["bird-2"] , this.assets["images"]["bird-3"]);
 	this.drawScore();
+	if(!this.gameOn) this.drawGameoverScene();
 
 }
 
@@ -89,9 +111,7 @@ Game.prototype.drawScene = function() {
 
 Game.prototype.updateGamePhysics = function() {
 	if(this.bird.hit) {
-		clearInterval(this.timer);
-		this.assets["sounds"]["background"].pause();
-		this.assets["sounds"]["lose"].play();
+		this.gameOn = false;
 	}
 	this.bird.updateMeasures();
 	this.block.updateMeasures();
@@ -101,11 +121,15 @@ Game.prototype.updateGamePhysics = function() {
 //-------------------------------------------------------------------------------------------------
 
 Game.prototype.gameAudio = function() {
-	this.assets["sounds"]["background"].loop = true;
-	this.assets["sounds"]["background"].play();
-	console.log(this.assets["sounds"]["background"])
+	if(!this.gameOn) {
+		this.assets["sounds"]["background"].pause();
+		this.assets["sounds"]["lose"].play();
+	} else {
+		this.assets["sounds"]["background"].play();
+	}
 }
 
+//-------------------------------------------------------------------------------------------------
 
 let game = new Game("jesus");
 game.start();
